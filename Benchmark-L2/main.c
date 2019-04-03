@@ -2,6 +2,12 @@
 #include "rpi-SmartStart.h"
 #include "emb-stdio.h"
 #include "mmu.h"
+#include "pmu.h"
+
+void memory_access_benchmark();
+void benchmark();
+
+int glob_val = 1;
 
 static uint32_t check_sem = 0;
 static uint32_t check_hello = 0;
@@ -21,20 +27,234 @@ void Core_SayHello(void)
 	semaphore_dec(&check_hello);
 }
 
-inline void reset_cycle_counter() {
-	uint64_t pmcr;
-	__asm__ volatile ("mrs %0, PMCR_EL0" : "=r" (pmcr));
-	pmcr |= (1 << 2);
-	__asm__ volatile ("msr PMCR_EL0, %0" : "=r" (pmcr));
-}
-
-inline uint64_t get_cycle_counter() {
-	uint64_t cc;
-	__asm__ volatile ("mrs %0, PMCCNTR_EL0" : "=r" (cc));
-	return cc;
-}
-
 #define ITER 5000
+// MAKE SURE THE CODE IS COMPILED WITH -00 OTHERWISE THE ASM INSTRUCTIONS WILL BE REMOVED.
+void memory_access_benchmark() {
+	uint64_t cycle1;
+	uint64_t cycle2;
+
+	printf("enter benchmark\n");
+	while (1) {
+		reset_cycle_counter();
+		cycle1 = get_cycle_counter();
+		{
+			__asm__("mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					mov x4, #100; \
+					");
+		}
+		cycle2 = get_cycle_counter();
+
+		printf("mov diff=%lu\n", cycle2 - cycle1);
+
+		reset_cycle_counter();
+		cycle1 = get_cycle_counter();
+		{
+			__asm__("ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					ldr x4, [%0]; \
+					" : : "r"(&glob_val));
+		}
+		cycle2 = get_cycle_counter();
+
+		printf("memory mov diff=%lu\n", cycle2 - cycle1);
+	}
+}
+
 void benchmark() {
 	int32_t i;
 	uint64_t cycle1;
@@ -80,14 +300,7 @@ void benchmark() {
 	}
 }
 
-
-static const char Spin[4] = { '|', '/', '-', '\\' };
-void main(void)
-{
-	pl011_uart_init(115200);
-	Init_EmbStdio(pl011_uart_putc);						// Initialize embedded stdio
-	displaySmartStart(printf);										// Display smart start details
-	ARM_setmaxspeed(printf);										// ARM CPU to max speed
+void full_init() {
 
 	/* Create MMU translation tables with Core 0 */
 	init_page_table();
@@ -111,12 +324,10 @@ void main(void)
 	printf("Setting up MMU on core 3\n");
 	CoreExecute(3, mmu_init);
 
-
 	// Dont print until table load done
 	semaphore_inc(&table_loaded);  // Lock the semaphore
 	printf("The cores have all started their MMU\n");
 	semaphore_dec(&table_loaded);  // Lock the semaphore
-
 
 	semaphore_inc(&table_loaded);
 	printf("Semaphore table_loaded locked .. check from other cores\n");
@@ -151,7 +362,19 @@ void main(void)
 	semaphore_dec(&check_hello); // release hello semaphore
 
 	while (hellocount != 3) {};
+}
+
+static const char Spin[4] = { '|', '/', '-', '\\' };
+void main(void)
+{
+	pl011_uart_init(115200);
+	Init_EmbStdio(pl011_uart_putc);						// Initialize embedded stdio
+	displaySmartStart(printf);										// Display smart start details
+	ARM_setmaxspeed(printf);										// ARM CPU to max speed
+
+	full_init();
 
 	printf("test all done ... now benchmarking start\n");
-	benchmark();
+	//benchmark();
+	memory_access_benchmark();
 }
