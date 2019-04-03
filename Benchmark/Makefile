@@ -16,8 +16,8 @@ else
 endif 
 
 
-Pi3-64: CFLAGS = -Wall -O3 -mcpu=cortex-a53+fp+simd -ffreestanding -nostartfiles -std=c11 -mstrict-align -fno-tree-loop-vectorize -fno-tree-slp-vectorize -Wno-nonnull-compare
-Pi3-64: ARMGNU = d:/gcc-linaro-7.4.1-2019.02-i686-mingw32_aarch64-elf/bin/aarch64-elf
+Pi3-64: CFLAGS = -Wall -O3 -mcpu=cortex-a53 -ffreestanding -nostartfiles -std=c11 -fno-tree-loop-vectorize -fno-tree-slp-vectorize -Wno-nonnull-compare
+Pi3-64: ARMGNU = arm-none-eabi
 Pi3-64: LINKERFILE = rpi64.ld
 Pi3-64:	SMARTSTART = SmartStart64.S
 Pi3-64: IMGFILE = kernel8.img
